@@ -21,9 +21,9 @@ const DEFAULT_USER_PASSWORD = '123456';
 
 export default class ImportCommand implements CliCommandInterface {
   public readonly name = '--import';
-  private userService!: UserServiceInterface;
-  private filmService!: FilmServiceInterface;
-  private databaseService!: DatabaseInterface;
+  private userService: UserServiceInterface;
+  private filmService: FilmServiceInterface;
+  private databaseService: DatabaseInterface;
   private logger: LoggerInterface;
   private salt!: string;
 

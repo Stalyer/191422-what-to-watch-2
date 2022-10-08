@@ -1,0 +1,496 @@
+openapi: 3.1.0
+info:
+  title: API сервер для проекта «Что посмотреть».
+  description: |-
+    * Список ресурсов и маршрутов сервера «Что посмотреть».
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 1.0.0
+tags:
+  - name: users
+    description: Действия с пользователем.
+  - name: film
+    description: Действия с фильмами.
+  - name: films
+    description: Действия с списком фильмов.
+  - name: watchlist
+    description: Действия с списком просмотров.
+  - name: comments
+    description: Действия с комментариями.
+
+paths:
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Регистрация пользователя
+      description: Регистрирует нового пользователя.
+      requestBody:
+        description: Информация для создания нового пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createUser"
+        required: true
+      responses:
+        "201":
+          description: Пользователь зарегистрирован. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "409":
+          description: Пользователь с таким email уже существует.
+
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Авторизация пользователя
+      description: Авторизует пользователя на основе логина и пароля
+      requestBody:
+        description: Информация для авторизации пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/loginUser"
+        required: true
+      responses:
+        "200":
+          description: Пользователь авторизован. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "400":
+          description: Ошибка запроса.
+        "401":
+          description: Авторизация пользователя не удалась.
+    get:
+      tags:
+        - users
+      summary: Проверка состояния пользователя
+      description: Возвращает состояние о авторизованном пользователе
+      responses:
+        "200":
+          description: Статус пользователя. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "401":
+          description: Пользователь не авторизован.
+
+  /films:
+    get:
+      tags:
+        - films
+      summary: Получить список фильмов
+      description: Возвращает массив фильмов
+      responses:
+        "200":
+          description: Список фильмов. Массив с объектами фильмов.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/film"
+
+  /films/{genre}:
+    parameters:
+    - name: genre
+      in: path
+      description: Жанр фильма
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+        - films
+      summary: Получить список фильмов по жанру
+      description: Возвращает массив фильмов по определенному жанру
+      responses:
+        "200":
+          description: Список фильмов по жанру. Массив с объектами фильмов.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/film"
+
+  /film/{filmId}:
+    parameters:
+    - name: filmId
+      in: path
+      description: Уникальный идентификатор фильма
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+        - film
+      summary: Получить информацию о фильме
+      description: Возвращает детальную информацию по фильму
+      responses:
+        "200":
+          description: Детальная информация о фильме. Объект фильма.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/film"
+        "404":
+          description: Фильм не найден.
+    patch:
+      tags:
+        - film
+      summary: Обновить информацию о фильме
+      description: Возвращает обновленную информацию по фильму
+      requestBody:
+        description: Информация для обновления фильма.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createFilm"
+        required: true
+      responses:
+        "201":
+          description: Фильм обновлен. Объект фильма.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/film"
+        "401":
+          description: Пользователь не авторизован.
+        "404":
+          description: Фильм не найден.
+    delete:
+      tags:
+        - film
+      summary: Удаляет информацию о фильме
+      description: Удаляет информацию о фильме по указанному filmId
+      responses:
+        "204":
+          description: Фильм удален.
+        "401":
+          description: Пользователь не авторизован.
+        "404":
+          description: Фильм не найден.
+
+  /film:
+    post:
+      tags:
+        - film
+      summary: Добавить фильм
+      description: Добавляет новый фильм
+      requestBody:
+        description: Информация для добавления фильма.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createFilm"
+        required: true
+      responses:
+        "201":
+          description: Фильм добавлен. Объект фильма.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/film"
+        "400":
+          description: Ошибка запроса.
+        "401":
+          description: Пользователь не авторизован.
+
+  /film/promo:
+    get:
+      tags:
+        - film
+      summary: Получить информацию о промо-фильме
+      description: Возвращает детальную информацию о промо-фильме
+      responses:
+        "200":
+          description: Детальная информация о промо-фильме. Объект фильма.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/film"
+
+  /watchlist:
+    get:
+      tags:
+        - watchlist
+      summary: Получить список фильмов «К просмотру».
+      description: Возвращает массив фильмов «К просмотру».
+      responses:
+        "200":
+          description: Список фильмов «К просмотру». Массив с объектами фильмов.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/film"
+        "401":
+          description: Пользователь не авторизован.
+
+  /watchlist/{filmId}/{status}:
+    parameters:
+    - name: filmId
+      in: path
+      description: Уникальный идентификатор фильма
+      required: true
+      schema:
+        type: string
+    - name: status
+      in: path
+      description: Статус фильма. 0 - удаляет из списка, 1 - добавляет
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+        - watchlist
+      summary: Изменить статус «К просмотру» у фильма
+      description: Изменяет статус «К просмотру» у фильма по идентификатору.
+      requestBody:
+        description: Информация для добавления фильма.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createFilm"
+        required: true
+      responses:
+        "200":
+          description: Статус изменен. Объект фильма.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/film"
+        "400":
+          description: Ошибка запроса.
+        "401":
+          description: Пользователь не авторизован.
+
+  /comments/{filmId}:
+    parameters:
+    - name: filmId
+      in: path
+      description: Уникальный идентификатор фильма
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+        - comments
+      summary: Добавить комментарий к фильму
+      description: Добавляет комментарий к фильму по переданному идентификатору
+      requestBody:
+        description: Информация для добавления комментария.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createComment"
+        required: true
+      responses:
+        "201":
+          description: Комментарий добавлен. Объект комментария.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/comment"
+        "400":
+          description: Ошибка запроса.
+        "401":
+          description: Пользователь не авторизован.
+    get:
+      tags:
+        - comments
+      summary: Получить список комментариев к фильму
+      description: Возвращает список комментариев к фильму по переданному идентификатору
+      responses:
+        "200":
+          description: Список комментариев. Массив с объектами комментариев.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/comment"
+        "404":
+          description: Фильм не найден.
+
+
+components:
+  schemas:
+    createUser:
+      type: object
+      properties:
+        email:
+          type: string
+          example: name@example.com
+        name:
+          type: string
+          example: Name
+        password:
+          type: string
+          example: 123456
+
+    loginUser:
+      type: object
+      properties:
+        email:
+          type: string
+          example: name@example.com
+        password:
+          type: string
+          example: 123456
+
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        email:
+          type: string
+          example: name@example.com
+        name:
+          type: string
+          example: Name
+        avatarPath:
+          type: string
+          example: img/avatar/user.jpg
+
+    film:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        name:
+          type: string
+          example: We need to talk about Kevin
+        description:
+          type: string
+          example: Unscrupulous boxing promoters, violent bookmakers, a Russian gangster, incompetent amateur robbers and supposedly Jewish jewelers fight to track down a priceless stolen diamond.
+        publictionDate:
+          type: string
+          example: 2022-02-16T15:13:41.834Z
+        genre:
+          type: array
+          example: [horror, comedy]
+        released:
+          type: number
+          example: 2000
+        rating:
+          type: number
+          example: 5
+        previewVideoImage:
+          type: string
+          example: img/film/preview-video-image.jpg
+        previewVideoLink:
+          type: string
+          example: https://some-link
+        starring:
+          type: array
+          example: [Leonardo DiCaprio, Cameron Diaz]
+        director:
+          type: string
+          example: Steven Spielberg
+        runTime:
+          type: number
+          example: 40
+        commentCount:
+          type: number
+          example: 10
+        posterImage:
+          type: string
+          example: img/film/poster-image.jpg
+        backgroundImage:
+          type: string
+          example: img/film/background-image.jpg
+        backgroundColor:
+          type: string
+          example: '#EBC996'
+        user:
+          $ref: "#/components/schemas/user"
+
+    createFilm:
+      type: object
+      properties:
+        name:
+          type: string
+          example: We need to talk about Kevin
+        description:
+          type: string
+          example: Unscrupulous boxing promoters, violent bookmakers, a Russian gangster, incompetent amateur robbers and supposedly Jewish jewelers fight to track down a priceless stolen diamond.
+        publictionDate:
+          type: string
+          example: 2022-02-16T15:13:41.834Z
+        genre:
+          type: array
+          example: [horror, comedy]
+        released:
+          type: number
+          example: 2000
+        rating:
+          type: number
+          example: 5
+        previewVideoImage:
+          type: string
+          example: img/film/preview-video-image.jpg
+        previewVideoLink:
+          type: string
+          example: https://some-link
+        starring:
+          type: array
+          example: [Leonardo DiCaprio, Cameron Diaz]
+        director:
+          type: string
+          example: Steven Spielberg
+        runTime:
+          type: number
+          example: 40
+        commentCount:
+          type: number
+          example: 10
+        posterImage:
+          type: string
+          example: img/film/poster-image.jpg
+        backgroundImage:
+          type: string
+          example: img/film/background-image.jpg
+        backgroundColor:
+          type: string
+          example: '#EBC996'
+
+    comment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        comment:
+          type: string
+          example: Lorem ipsum dolor sit amet consectetur adipisicing elit.
+        rating:
+          type: number
+          example: 2
+        date:
+          type: string
+          example: 2022-02-16T15:13:41.834Z
+        user:
+          $ref: "#/components/schemas/user"
+
+    createComment:
+      type: object
+      properties:
+        comment:
+          type: string
+          example: Lorem ipsum dolor sit amet consectetur adipisicing elit.
+        rating:
+          type: number
+          example: 2
