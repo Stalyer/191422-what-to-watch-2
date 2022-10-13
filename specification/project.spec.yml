@@ -473,7 +473,7 @@ components:
         id:
           type: string
           example: 6329c3d6a04ab1061c6425ea
-        comment:
+        text:
           type: string
           example: Lorem ipsum dolor sit amet consectetur adipisicing elit.
         rating:
@@ -488,7 +488,7 @@ components:
     createComment:
       type: object
       properties:
-        comment:
+        text:
           type: string
           example: Lorem ipsum dolor sit amet consectetur adipisicing elit.
         rating:

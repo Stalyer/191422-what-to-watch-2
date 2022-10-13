@@ -11,53 +11,61 @@ export interface FilmEntity extends defaultClasses.Base {}
     collection: 'films'
   }
 })
+
 export class FilmEntity extends defaultClasses.TimeStamps {
-  @prop({required: true, trim: true})
+  @prop({
+    trim: true,
+    required: true
+  })
   public name!: string;
 
-  @prop({trim: true})
+  @prop({
+    trim: true,
+    required: true
+  })
   public description!: string;
 
-  @prop()
+  @prop({required: true})
   public publictionDate!: Date;
 
   @prop({
     type: () => String,
-    enum: FilmGenre
+    enum: FilmGenre,
+    required: true
   })
   public genre!: FilmGenre;
 
-  @prop()
+  @prop({required: true})
   public released!: number;
 
-  @prop()
+  @prop({default: 0})
   public rating!: number;
 
-  @prop()
+  @prop({required: true})
   public previewVideoImage!: string;
 
-  @prop()
+  @prop({required: true})
   public previewVideoLink!: string;
 
-  @prop()
+  @prop({required: true})
   public starring!: string[];
 
-  @prop()
+  @prop({required: true})
   public director!: string;
 
-  @prop()
+  @prop({required: true})
   public runTime!: number;
 
   @prop({default: 0})
   public commentCount!: number;
 
-  @prop()
+  @prop({required: true})
   public posterImage!: string;
 
-  @prop()
+  @prop({required: true})
   public backgroundImage!: string;
 
-  @prop()
+  @prop({required: true})
   public backgroundColor!: string;
 
   @prop({
@@ -65,6 +73,9 @@ export class FilmEntity extends defaultClasses.TimeStamps {
     required: true
   })
   public userId!: Ref<UserEntity>;
+
+  @prop({default: false})
+  public isPromo!: boolean;
 }
 
 export const FilmModel = getModelForClass(FilmEntity);
