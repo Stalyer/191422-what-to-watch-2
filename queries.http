@@ -2,3 +2,88 @@
 GET http://localhost:3123/api HTTP/1.1
 
 ###
+
+# Фильмы
+## Получить список фильмов
+
+GET http://localhost:4000/films HTTP/1.1
+Content-Type: application/json
+
+###
+
+## Получить фильм по идентификатору
+
+GET http://localhost:4000/films/633ecd63ac9ef5b6a2858619 HTTP/1.1
+
+###
+
+## Создать новый фильм
+
+POST http://localhost:4000/films HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Revenant",
+  "description": "Unscrupulous boxing promoters, violent bookmakers, a Russian gangster, incompetent amateur robbers and supposedly Jewish jewelers fight to track down a priceless stolen diamond.",
+  "publictionDate": "2022-02-16T15:13:41.834Z",
+  "genre": "horror",
+  "released": 2000,
+  "previewVideoImage": "preview-video-image-1.jpg",
+  "previewVideoLink": "https://some-link?1",
+  "starring": [
+    "Leonardo DiCaprio",
+    "Cameron Diaz",
+    ],
+  "director": "Steven Spielberg",
+  "runTime": 60,
+  "posterImage": "poster-image-1.jpg",
+  "backgroundImage": "background-image-1.jpg",
+  "backgroundColor": "#D8E3E5",
+  "userId": 0,
+  "isPromo": false,
+}
+
+###
+
+## Удаление фильма
+
+DELETE http://localhost:4000/films/633ecd63ac9ef5b6a2858619 HTTP/1.1
+
+###
+
+## Обновление фильма
+
+PATCH http://localhost:4000/films/633ecd63ac9ef5b6a2858619 HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Revenant 3",
+}
+
+
+# Пользователи
+## Регистрация пользователя
+
+POST http://localhost:4000/users/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "test@test.ru",
+  "name": "testUser",
+  "avatarPath": "avatar.png",
+  "password": "123456"
+}
+
+###
+
+## Авторизация пользователя
+
+POST http://localhost:4000/users/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "test@test.ru",
+  "password": "123456"
+}
+
+###

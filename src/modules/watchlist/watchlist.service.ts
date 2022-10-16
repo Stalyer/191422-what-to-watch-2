@@ -19,4 +19,12 @@ export default class WatchlistService implements WatchlistServiceInterface {
 
     return result;
   }
+
+  public async find(): Promise<DocumentType<WatchlistEntity>[]> {
+
+    return this.watchlistModel
+      .find()
+      .populate(['userId'])
+      .exec();
+  }
 }

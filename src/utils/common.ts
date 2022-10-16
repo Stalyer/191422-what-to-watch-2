@@ -1,6 +1,7 @@
 import crypto from 'crypto';
-import { FilmGenre } from '../types/film-genre.enum.js';
-import { Film } from '../types/film.type.js';
+import {plainToInstance, ClassConstructor} from 'class-transformer';
+import {FilmGenre} from '../types/film-genre.enum.js';
+import {Film} from '../types/film.type.js';
 
 export const createFilm = (row: string) => {
   const tokens = row.replace('\n', '').split('\t');
@@ -56,3 +57,10 @@ export const createSHA256 = (line: string, salt: string): string => {
   const shaHasher = crypto.createHmac('sha256', salt);
   return shaHasher.update(line).digest('hex');
 };
+
+export const fillDTO = <T, V>(someDto: ClassConstructor<T>, plainObject: V) =>
+  plainToInstance(someDto, plainObject, {excludeExtraneousValues: true});
+
+export const createErrorObject = (message: string) => ({
+  error: message,
+});

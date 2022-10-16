@@ -10,8 +10,6 @@ info:
 tags:
   - name: users
     description: Действия с пользователем.
-  - name: film
-    description: Действия с фильмами.
   - name: films
     description: Действия с списком фильмов.
   - name: watchlist
@@ -97,8 +95,31 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/film"
+    post:
+      tags:
+        - films
+      summary: Добавить фильм
+      description: Добавляет новый фильм
+      requestBody:
+        description: Информация для добавления фильма.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createFilm"
+        required: true
+      responses:
+        "201":
+          description: Фильм добавлен. Объект фильма.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/film"
+        "400":
+          description: Ошибка запроса.
+        "401":
+          description: Пользователь не авторизован.
 
-  /films/{genre}:
+  /films/genre/{genre}:
     parameters:
     - name: genre
       in: path
@@ -121,7 +142,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/film"
 
-  /film/{filmId}:
+  /films/{filmId}:
     parameters:
     - name: filmId
       in: path
@@ -131,7 +152,7 @@ paths:
         type: string
     get:
       tags:
-        - film
+        - films
       summary: Получить информацию о фильме
       description: Возвращает детальную информацию по фильму
       responses:
@@ -145,7 +166,7 @@ paths:
           description: Фильм не найден.
     patch:
       tags:
-        - film
+        - films
       summary: Обновить информацию о фильме
       description: Возвращает обновленную информацию по фильму
       requestBody:
@@ -168,7 +189,7 @@ paths:
           description: Фильм не найден.
     delete:
       tags:
-        - film
+        - films
       summary: Удаляет информацию о фильме
       description: Удаляет информацию о фильме по указанному filmId
       responses:
@@ -179,35 +200,10 @@ paths:
         "404":
           description: Фильм не найден.
 
-  /film:
-    post:
-      tags:
-        - film
-      summary: Добавить фильм
-      description: Добавляет новый фильм
-      requestBody:
-        description: Информация для добавления фильма.
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/createFilm"
-        required: true
-      responses:
-        "201":
-          description: Фильм добавлен. Объект фильма.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/film"
-        "400":
-          description: Ошибка запроса.
-        "401":
-          description: Пользователь не авторизован.
-
-  /film/promo:
+  /films/promo:
     get:
       tags:
-        - film
+        - films
       summary: Получить информацию о промо-фильме
       description: Возвращает детальную информацию о промо-фильме
       responses:
