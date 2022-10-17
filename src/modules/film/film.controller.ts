@@ -5,14 +5,15 @@ import {Controller} from '../../common/controller/controller.js';
 import {Component} from '../../types/component.types.js';
 import {LoggerInterface} from '../../common/logger/logger.interface.js';
 import {HttpMethod} from '../../types/http-method.enum.js';
-import HttpError from '../../common/errors/http-error.js';
-import {StatusCodes} from 'http-status-codes';
 import {fillDTO} from '../../utils/common.js';
 import {FilmServiceInterface} from './film-service.interface.js';
 import FilmResponse from './response/film.response.js';
 import CreateFilmDto from './dto/create-film.dto.js';
 import UpdateFilmDto from './dto/update-film.dto.js';
 import {RequestQuery} from '../../types/request-query.type.js';
+import {ValidateObjectIdMiddleware} from '../../common/middlewares/validate-objectid.middleware.js';
+import {ValidateDtoMiddleware} from '../../common/middlewares/validate-dto.middleware.js';
+import {DocumentExistsMiddleware} from '../../common/middlewares/document-exists.middleware.js';
 
 type ParamsGetFilm = {
   filmId: string;
@@ -33,11 +34,41 @@ export default class FilmController extends Controller {
     this.logger.info('Register routes for FilmController…');
 
     this.addRoute({path: '/', method: HttpMethod.Get, handler: this.index});
-    this.addRoute({path: '/', method: HttpMethod.Post, handler: this.create});
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [new ValidateDtoMiddleware(CreateFilmDto)]
+    });
     this.addRoute({path: '/genre/:genre', method: HttpMethod.Get, handler: this.getByGenre});
-    this.addRoute({path: '/:filmId', method: HttpMethod.Get, handler: this.show});
-    this.addRoute({path: '/:filmId', method: HttpMethod.Delete, handler: this.delete});
-    this.addRoute({path: '/:filmId', method: HttpMethod.Patch, handler: this.update});
+    this.addRoute({
+      path: '/:filmId',
+      method: HttpMethod.Get,
+      handler: this.show,
+      middlewares: [
+        new ValidateObjectIdMiddleware('filmId'),
+        new DocumentExistsMiddleware(this.filmService, 'films', 'filmId')
+      ]
+    });
+    this.addRoute({
+      path: '/:filmId',
+      method: HttpMethod.Delete,
+      handler: this.delete,
+      middlewares: [
+        new ValidateObjectIdMiddleware('filmId'),
+        new DocumentExistsMiddleware(this.filmService, 'films', 'filmId')
+      ]
+    });
+    this.addRoute({
+      path: '/:filmId',
+      method: HttpMethod.Patch,
+      handler: this.update,
+      middlewares: [
+        new ValidateObjectIdMiddleware('filmId'),
+        new ValidateDtoMiddleware(UpdateFilmDto),
+        new DocumentExistsMiddleware(this.filmService, 'films', 'filmId')
+      ]
+    });
     this.addRoute({path: '/promo', method: HttpMethod.Get, handler: this.getPromo});
   }
 
@@ -72,15 +103,6 @@ export default class FilmController extends Controller {
   ): Promise<void> {
     const {filmId} = params;
     const film = await this.filmService.findById(filmId);
-
-    if (!film) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Film with id ${filmId} not found.`,
-        'FilmController'
-      );
-    }
-
     this.ok(res, fillDTO(FilmResponse, film));
   }
 
@@ -90,15 +112,6 @@ export default class FilmController extends Controller {
   ): Promise<void> {
     const {filmId} = params;
     const film = await this.filmService.deleteById(filmId);
-
-    if (!film) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Film with id ${filmId} not found.`,
-        'FilmController'
-      );
-    }
-
     this.noContent(res, film);
   }
 
@@ -107,15 +120,6 @@ export default class FilmController extends Controller {
     res: Response
   ): Promise<void> {
     const updatedFilm = await this.filmService.updateById(params.filmId, body);
-
-    if (!updatedFilm) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Film with id ${params.filmId} not found.`,
-        'FilmController'
-      );
-    }
-
     this.ok(res, fillDTO(FilmResponse, updatedFilm));
   }
 

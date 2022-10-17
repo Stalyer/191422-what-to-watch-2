@@ -4,8 +4,6 @@ import {Controller} from '../../common/controller/controller.js';
 import {Component} from '../../types/component.types.js';
 import {LoggerInterface} from '../../common/logger/logger.interface.js';
 import {HttpMethod} from '../../types/http-method.enum.js';
-// import HttpError from '../../common/errors/http-error.js';
-// import {StatusCodes} from 'http-status-codes';
 import {fillDTO} from '../../utils/common.js';
 import {WatchlistServiceInterface} from './watchlist-service.interface.js';
 import FilmResponse from '../film/response/film.response.js';

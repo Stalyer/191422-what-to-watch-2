@@ -24,7 +24,8 @@ import {WatchlistEntity, WatchlistModel} from './modules/watchlist/watchlist.ent
 import {ControllerInterface} from './common/controller/controller.interface.js';
 import FilmController from './modules/film/film.controller.js';
 import UserController from './modules/user/user.controller.js';
-import WatchlistController from './modules/watchlist/watchlist.controler.js';
+import WatchlistController from './modules/watchlist/watchlist.controller.js';
+import CommentController from './modules/comment/comment.controller.js';
 import ExceptionFilter from './common/errors/exception-filter.js';
 import {ExceptionFilterInterface} from './common/errors/exception-filter.interface.js';
 
@@ -45,6 +46,7 @@ applicationContainer.bind<types.ModelType<WatchlistEntity>>(Component.WatchlistM
 applicationContainer.bind<ControllerInterface>(Component.FilmController).to(FilmController).inSingletonScope();
 applicationContainer.bind<ControllerInterface>(Component.UserController).to(UserController).inSingletonScope();
 applicationContainer.bind<ControllerInterface>(Component.WatchlistController).to(WatchlistController).inSingletonScope();
+applicationContainer.bind<ControllerInterface>(Component.CommentController).to(CommentController).inSingletonScope();
 applicationContainer.bind<ExceptionFilterInterface>(Component.ExceptionFilterInterface).to(ExceptionFilter).inSingletonScope();
 
 const application = applicationContainer.get<Application>(Component.Application);
