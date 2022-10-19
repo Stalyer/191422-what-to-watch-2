@@ -1,8 +1,6 @@
 import {
-  IsMongoId,
   IsString,
   Length,
-  IsOptional,
   IsInt,
   Min,
   Max
@@ -18,10 +16,7 @@ export default class CreateCommentDto {
   @Max(10, {message: 'Maximum rating is 10'})
   public rating!: number;
 
-  @IsOptional()
-  @IsMongoId({message: 'filmId field must be a valid id'})
   public filmId!: string;
 
-  @IsMongoId({message: 'userId field must be a valid id'})
   public userId!: string;
 }

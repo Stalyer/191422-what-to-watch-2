@@ -13,6 +13,7 @@ import CommentResponse from './response/comment.response.js';
 import {ValidateObjectIdMiddleware} from '../../common/middlewares/validate-objectid.middleware.js';
 import {ValidateDtoMiddleware} from '../../common/middlewares/validate-dto.middleware.js';
 import {DocumentExistsMiddleware} from '../../common/middlewares/document-exists.middleware.js';
+import {PrivateRouteMiddleware} from '../../common/middlewares/private-route.middleware.js';
 
 type ParamsGetFilm = {
   filmId: string;
@@ -41,6 +42,7 @@ export default class CommentController extends Controller {
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('filmId'),
         new ValidateDtoMiddleware(CreateCommentDto),
         new DocumentExistsMiddleware(this.filmService, 'films', 'filmId')
@@ -57,11 +59,12 @@ export default class CommentController extends Controller {
   }
 
   public async create(
-    {params, body}: Request<core.ParamsDictionary | ParamsGetFilm, object, CreateCommentDto>,
+    {params, body, user}: Request<core.ParamsDictionary | ParamsGetFilm, object, CreateCommentDto>,
     res: Response
   ): Promise<void> {
-    body.filmId = params.filmId;
-    const comment = await this.commentService.create(body);
+    console.log(params);
+    console.log(user);
+    const comment = await this.commentService.create({...body, filmId: params.filmId, userId: user.id});
     await this.filmService.incCommentCount(params.filmId);
     this.created(res, fillDTO(CommentResponse, comment));
   }

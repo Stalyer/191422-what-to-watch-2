@@ -4,7 +4,6 @@ import {
   IsDateString,
   IsEnum,
   IsInt,
-  IsMongoId,
   IsString,
   MaxLength,
   MinLength,
@@ -53,7 +52,6 @@ export default class CreateFilmDto {
   @IsString({message: 'backgroundColor is required'})
   public backgroundColor!: string;
 
-  @IsMongoId({message: 'userId field must be valid an id'})
   public userId!: string;
 
   @IsBoolean({message: 'isPromo must be an boolean'})

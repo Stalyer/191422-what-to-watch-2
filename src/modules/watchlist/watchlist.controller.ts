@@ -7,6 +7,7 @@ import {HttpMethod} from '../../types/http-method.enum.js';
 import {fillDTO} from '../../utils/common.js';
 import {WatchlistServiceInterface} from './watchlist-service.interface.js';
 import FilmResponse from '../film/response/film.response.js';
+// import {PrivateRouteMiddleware} from '../../common/middlewares/private-route.middleware.js';
 
 @injectable()
 export default class WatchlistController extends Controller {

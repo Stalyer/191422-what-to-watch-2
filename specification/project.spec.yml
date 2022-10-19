@@ -411,6 +411,12 @@ components:
         backgroundColor:
           type: string
           example: '#EBC996'
+        isPromo:
+          type: boolean
+          example: false
+        iswWatchlist:
+          type: boolean
+          example: false
         user:
           $ref: "#/components/schemas/user"
 
@@ -462,6 +468,9 @@ components:
         backgroundColor:
           type: string
           example: '#EBC996'
+        isPromo:
+          type: boolean
+          example: false
 
     comment:
       type: object

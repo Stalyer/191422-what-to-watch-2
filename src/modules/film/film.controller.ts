@@ -14,6 +14,7 @@ import {RequestQuery} from '../../types/request-query.type.js';
 import {ValidateObjectIdMiddleware} from '../../common/middlewares/validate-objectid.middleware.js';
 import {ValidateDtoMiddleware} from '../../common/middlewares/validate-dto.middleware.js';
 import {DocumentExistsMiddleware} from '../../common/middlewares/document-exists.middleware.js';
+import {PrivateRouteMiddleware} from '../../common/middlewares/private-route.middleware.js';
 
 type ParamsGetFilm = {
   filmId: string;
@@ -46,6 +47,7 @@ export default class FilmController extends Controller {
       method: HttpMethod.Get,
       handler: this.show,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('filmId'),
         new DocumentExistsMiddleware(this.filmService, 'films', 'filmId')
       ]
@@ -55,6 +57,7 @@ export default class FilmController extends Controller {
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('filmId'),
         new DocumentExistsMiddleware(this.filmService, 'films', 'filmId')
       ]
@@ -64,6 +67,7 @@ export default class FilmController extends Controller {
       method: HttpMethod.Patch,
       handler: this.update,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('filmId'),
         new ValidateDtoMiddleware(UpdateFilmDto),
         new DocumentExistsMiddleware(this.filmService, 'films', 'filmId')
@@ -81,10 +85,10 @@ export default class FilmController extends Controller {
   }
 
   public async create(
-    {body}: Request<Record<string, unknown>, Record<string, unknown>, CreateFilmDto>,
+    {body, user}: Request<Record<string, unknown>, Record<string, unknown>, CreateFilmDto>,
     res: Response
   ): Promise<void> {
-    const result = await this.filmService.create(body);
+    const result = await this.filmService.create({...body, userId: user.id});
     const film = await this.filmService.findById(result.id);
     this.created(res, fillDTO(FilmResponse, film));
   }
