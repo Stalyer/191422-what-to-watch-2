@@ -232,7 +232,7 @@ paths:
         "401":
           description: Пользователь не авторизован.
 
-  /watchlist/{filmId}/{status}:
+  /watchlist/{filmId}:
     parameters:
     - name: filmId
       in: path
@@ -240,31 +240,30 @@ paths:
       required: true
       schema:
         type: string
-    - name: status
-      in: path
-      description: Статус фильма. 0 - удаляет из списка, 1 - добавляет
-      required: true
-      schema:
-        type: string
     post:
       tags:
         - watchlist
-      summary: Изменить статус «К просмотру» у фильма
-      description: Изменяет статус «К просмотру» у фильма по идентификатору.
-      requestBody:
-        description: Информация для добавления фильма.
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/createFilm"
-        required: true
+      summary: Добавляет фильм в список «К просмотру»
+      description: Добавляет фильм в список «К просмотру» по идентификатору фильма.
       responses:
         "200":
-          description: Статус изменен. Объект фильма.
+          description: Фильм добавлен в список. Объект фильма.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/film"
+        "400":
+          description: Ошибка запроса.
+        "401":
+          description: Пользователь не авторизован.
+    delete:
+      tags:
+        - watchlist
+      summary: Удаляет фильм в список «К просмотру»
+      description: Удаляет фильм в список «К просмотру» по идентификатору фильма.
+      responses:
+        "204":
+          description: Фильм удален из списка «К просмотру».
         "400":
           description: Ошибка запроса.
         "401":

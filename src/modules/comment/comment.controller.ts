@@ -23,7 +23,7 @@ export default class CommentController extends Controller {
   constructor(
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
-    @inject(Component.FilmServiceInterface) private  readonly filmService: FilmServiceInterface,
+    @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
   ) {
     super(logger);
 
@@ -62,12 +62,9 @@ export default class CommentController extends Controller {
     {params, body, user}: Request<core.ParamsDictionary | ParamsGetFilm, object, CreateCommentDto>,
     res: Response
   ): Promise<void> {
-    console.log(params);
-    console.log(user);
     const comment = await this.commentService.create({...body, filmId: params.filmId, userId: user.id});
     await this.filmService.incCommentCount(params.filmId);
+    await this.filmService.updateRating(params.filmId);
     this.created(res, fillDTO(CommentResponse, comment));
   }
-
-
 }

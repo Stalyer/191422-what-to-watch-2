@@ -13,5 +13,6 @@ export interface FilmServiceInterface extends DocumentExistsInterface {
   deleteById(filmId: string): Promise<DocumentType<FilmEntity> | null>;
   updateById(filmId: string, dto: UpdateFilmDto): Promise<DocumentType<FilmEntity> | null>;
   incCommentCount(filmId: string): Promise<DocumentType<FilmEntity> | null>;
+  updateRating(filmId: string): Promise<DocumentType<FilmEntity> | null>;
   exists(documentId: string): Promise<boolean>;
 }

@@ -1,5 +1,5 @@
 import typegoose, {defaultClasses, getModelForClass, Ref} from '@typegoose/typegoose';
-// import {FilmEntity} from '../film/film.entity.js';
+import {FilmEntity} from '../film/film.entity.js';
 import {UserEntity} from '../user/user.entity.js';
 
 const {prop, modelOptions} = typegoose;
@@ -20,11 +20,10 @@ export class WatchlistEntity extends defaultClasses.TimeStamps {
   public userId!: Ref<UserEntity>;
 
   @prop({
-    type: () => [String],
-    default: [],
+    ref: FilmEntity,
     required: true
   })
-  public filmId!: string;
+  public filmId!: Ref<FilmEntity>;
 }
 
 export const WatchlistModel = getModelForClass(WatchlistEntity);

@@ -77,9 +77,10 @@ export default class FilmController extends Controller {
   }
 
   public async index(
-    {query}: Request<core.ParamsDictionary, unknown, unknown, RequestQuery>,
+    {query, user}: Request<core.ParamsDictionary, unknown, unknown, RequestQuery>,
     res: Response
   ): Promise<void> {
+    console.log(user);
     const films = await this.filmService.find(query.limit);
     this.ok(res, fillDTO(FilmResponse, films));
   }

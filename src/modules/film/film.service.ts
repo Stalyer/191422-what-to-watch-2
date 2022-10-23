@@ -1,4 +1,5 @@
 import {inject, injectable} from 'inversify';
+import {Types} from 'mongoose';
 import {FilmServiceInterface} from './film-service.interface.js';
 import CreateFilmDto from './dto/create-film.dto.js';
 import {DocumentType, types} from '@typegoose/typegoose';
@@ -8,12 +9,16 @@ import {LoggerInterface} from '../../common/logger/logger.interface.js';
 import UpdateFilmDto from './dto/update-film.dto.js';
 import {DEFAULT_FILM_COUNT} from './film.constant.js';
 import {SortType} from '../../types/sort-type.enum.js';
+import {CommentEntity} from '../comment/comment.entity.js';
+// import {WatchlistEntity} from '../watchlist/watchlist.entity.js';
 
 @injectable()
 export default class FilmService implements FilmServiceInterface {
   constructor(
     @inject(Component.LoggerInterface) private  readonly logger: LoggerInterface,
-    @inject(Component.FilmModel) private readonly filmModel: types.ModelType<FilmEntity>
+    @inject(Component.FilmModel) private readonly filmModel: types.ModelType<FilmEntity>,
+    @inject(Component.CommentModel) private readonly commentModel: types.ModelType<CommentEntity>,
+    // @inject(Component.WatchlistModel) private readonly watchlistModel: types.ModelType<WatchlistEntity>
   ) {}
 
   public async create(dto: CreateFilmDto): Promise<DocumentType<FilmEntity>> {
@@ -75,6 +80,30 @@ export default class FilmService implements FilmServiceInterface {
       .findByIdAndUpdate(filmId, {'$inc': {
         commentCount: 1,
       }}).exec();
+  }
+
+  public async updateRating(filmId: string): Promise<DocumentType<FilmEntity> | null> {
+    const result = await this.commentModel
+      .aggregate([
+        {
+          $match: {
+            filmId: new Types.ObjectId(filmId)
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            avgRating: { $avg: '$rating' }
+          }
+        }
+      ])
+      .exec();
+
+    return this.filmModel
+      .findByIdAndUpdate(filmId, {'$set': {
+        rating: result[0]['avgRating'],
+      }})
+      .exec();
   }
 
   public async exists(documentId: string): Promise<boolean> {
