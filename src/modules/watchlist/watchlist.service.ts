@@ -1,4 +1,5 @@
 import {inject, injectable} from 'inversify';
+import {Types} from 'mongoose';
 import {WatchlistServiceInterface} from './watchlist-service.interface.js';
 import CreateWatchlistDto from './dto/create-watchlist.dto.js';
 import {DocumentType, types} from '@typegoose/typegoose';
@@ -25,6 +26,33 @@ export default class WatchlistService implements WatchlistServiceInterface {
   }
 
   public async find(userId: string): Promise<DocumentType<FilmEntity>[]> {
+    const watchlist = await this.findIds(userId);
+    if (!watchlist) {
+      return [];
+    }
+
+    return this.filmModel
+      .aggregate([
+        { $match: {'_id': { $in: watchlist}} },
+        {
+          $lookup: {
+            from: 'users',
+            let: { userId: '$userId' },
+            pipeline: [{ $match: { $expr: { $eq: ['$$userId', '$_id'] } } }],
+            as: 'userId',
+          },
+        },
+        {
+          $addFields: {
+            id: { $toString: '$_id' },
+            isWatchlist: true
+          },
+        }
+      ])
+      .exec();
+  }
+
+  public async findIds(userId: string): Promise<Types.ObjectId[]> {
     const watchlist = await this.watchlistModel
       .find({userId})
       .exec();
@@ -32,11 +60,7 @@ export default class WatchlistService implements WatchlistServiceInterface {
       return [];
     }
 
-    const filmIds = watchlist.map((item) => item.filmId);
-    const films = await this.filmModel
-      .find({'_id': { '$in': filmIds}})
-      .exec();
-    return films;
+    return watchlist.map((item) => item.filmId) as Types.ObjectId[];
   }
 
   public async findById(userId: string, filmId: string): Promise<DocumentType<WatchlistEntity> | null> {

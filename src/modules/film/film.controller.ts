@@ -8,6 +8,7 @@ import {HttpMethod} from '../../types/http-method.enum.js';
 import {fillDTO} from '../../utils/common.js';
 import {FilmServiceInterface} from './film-service.interface.js';
 import FilmResponse from './response/film.response.js';
+import {WatchlistServiceInterface} from '../watchlist/watchlist-service.interface.js';
 import CreateFilmDto from './dto/create-film.dto.js';
 import UpdateFilmDto from './dto/update-film.dto.js';
 import {RequestQuery} from '../../types/request-query.type.js';
@@ -29,6 +30,7 @@ export default class FilmController extends Controller {
   constructor(
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
+    @inject(Component.WatchlistServiceInterface) private readonly watchlistService: WatchlistServiceInterface,
   ) {
     super(logger);
 
@@ -80,8 +82,8 @@ export default class FilmController extends Controller {
     {query, user}: Request<core.ParamsDictionary, unknown, unknown, RequestQuery>,
     res: Response
   ): Promise<void> {
-    console.log(user);
-    const films = await this.filmService.find(query.limit);
+    const watchlist = user ? await this.watchlistService.findIds(user.id) : [];
+    const films = await this.filmService.find(query.limit, watchlist);
     this.ok(res, fillDTO(FilmResponse, films));
   }
 
@@ -95,19 +97,21 @@ export default class FilmController extends Controller {
   }
 
   public async getByGenre(
-    {params, query}: Request<core.ParamsDictionary | ParamsGetFilmsByGenre, unknown, unknown, RequestQuery>,
+    {params, query, user}: Request<core.ParamsDictionary | ParamsGetFilmsByGenre, unknown, unknown, RequestQuery>,
     res: Response
   ): Promise<void> {
-    const films = await this.filmService.findByGenreName(params.genre, query.limit);
+    const watchlist = user ? await this.watchlistService.findIds(user.id) : [];
+    const films = await this.filmService.findByGenreName(params.genre, query.limit, watchlist);
     this.ok(res, fillDTO(FilmResponse, films));
   }
 
   public async show(
-    {params}: Request<core.ParamsDictionary | ParamsGetFilm>,
+    {params, user}: Request<core.ParamsDictionary | ParamsGetFilm>,
     res: Response
   ): Promise<void> {
     const {filmId} = params;
-    const film = await this.filmService.findById(filmId);
+    const watchlist = user ? await this.watchlistService.findIds(user.id) : [];
+    const film = await this.filmService.findById(filmId, watchlist);
     this.ok(res, fillDTO(FilmResponse, film));
   }
 
@@ -129,10 +133,11 @@ export default class FilmController extends Controller {
   }
 
   public async getPromo(
-    _req: Request,
+    {user}: Request,
     res: Response
   ): Promise<void> {
-    const film = await this.filmService.findPromo();
+    const watchlist = user ? await this.watchlistService.findIds(user.id) : [];
+    const film = await this.filmService.findPromo(watchlist);
     this.ok(res, fillDTO(FilmResponse, film));
   }
 }

@@ -56,4 +56,7 @@ export default class FilmResponse {
 
   @Expose()
   public isPromo!: boolean;
+
+  @Expose()
+  public isWatchlist!: boolean;
 }

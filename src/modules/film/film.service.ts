@@ -10,15 +10,13 @@ import UpdateFilmDto from './dto/update-film.dto.js';
 import {DEFAULT_FILM_COUNT} from './film.constant.js';
 import {SortType} from '../../types/sort-type.enum.js';
 import {CommentEntity} from '../comment/comment.entity.js';
-// import {WatchlistEntity} from '../watchlist/watchlist.entity.js';
 
 @injectable()
 export default class FilmService implements FilmServiceInterface {
   constructor(
-    @inject(Component.LoggerInterface) private  readonly logger: LoggerInterface,
+    @inject(Component.LoggerInterface) private readonly logger: LoggerInterface,
     @inject(Component.FilmModel) private readonly filmModel: types.ModelType<FilmEntity>,
     @inject(Component.CommentModel) private readonly commentModel: types.ModelType<CommentEntity>,
-    // @inject(Component.WatchlistModel) private readonly watchlistModel: types.ModelType<WatchlistEntity>
   ) {}
 
   public async create(dto: CreateFilmDto): Promise<DocumentType<FilmEntity>> {
@@ -28,37 +26,126 @@ export default class FilmService implements FilmServiceInterface {
     return result;
   }
 
-  public async findById(filmId: string): Promise<DocumentType<FilmEntity> | null> {
+  public async findById(filmId: string, watchlist?: Types.ObjectId[]): Promise<DocumentType<FilmEntity> | null> {
+    return (
+      await this.filmModel
+        .aggregate([
+          { $match: { _id: new Types.ObjectId(filmId) } },
+          {
+            $lookup: {
+              from: 'users',
+              let: { userId: '$userId' },
+              pipeline: [{ $match: { $expr: { $eq: ['$$userId', '$_id'] } } }],
+              as: 'userId',
+            },
+          },
+          {
+            $addFields: {
+              id: { $toString: '$_id' },
+              isWatchlist:  {
+                $cond: {
+                  if: { $in: [ '$_id', watchlist ] },
+                  then: true,
+                  else: false,
+                }
+              }
+            }
+          },
+        ])
+        .exec()
+    )[0];
+  }
+
+  public async findPromo(watchlist?: Types.ObjectId[]): Promise<DocumentType<FilmEntity> | null> {
+    return (
+      await this.filmModel
+        .aggregate([
+          { $match: { isPromo: true } },
+          {
+            $lookup: {
+              from: 'users',
+              let: { userId: '$userId' },
+              pipeline: [{ $match: { $expr: { $eq: ['$$userId', '$_id'] } } }],
+              as: 'userId',
+            },
+          },
+          {
+            $addFields: {
+              id: { $toString: '$_id' },
+              isWatchlist:  {
+                $cond: {
+                  if: { $in: [ '$_id', watchlist ] },
+                  then: true,
+                  else: false,
+                }
+              }
+            }
+          },
+        ])
+        .exec()
+    )[0];
+  }
+
+  public async find(count?: number, watchlist?: Types.ObjectId[]): Promise<DocumentType<FilmEntity>[]> {
+    const limit = count ? Number(count) : DEFAULT_FILM_COUNT;
+
     return this.filmModel
-      .findById(filmId)
-      .populate(['userId'])
+      .aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            let: { userId: '$userId' },
+            pipeline: [{ $match: { $expr: { $eq: ['$$userId', '$_id'] } } }],
+            as: 'userId',
+          },
+        },
+        {
+          $addFields: {
+            id: { $toString: '$_id' },
+            isWatchlist:  {
+              $cond: {
+                if: { $in: [ '$_id', watchlist ] },
+                then: true,
+                else: false,
+              }
+            }
+          }
+        },
+        { $limit: limit },
+        { $sort: { createdAt: SortType.Down } },
+      ])
       .exec();
   }
 
-  public async findPromo(): Promise<DocumentType<FilmEntity> | null> {
-    return this.filmModel
-      .findOne({isPromo: true})
-      .populate(['userId'])
-      .exec();
-  }
-
-  public async find(count?: number): Promise<DocumentType<FilmEntity>[]> {
-    const limit = count ?? DEFAULT_FILM_COUNT;
+  public async findByGenreName(genreName: string, count?: number, watchlist?: Types.ObjectId[]): Promise<DocumentType<FilmEntity>[]> {
+    const limit = count ? Number(count) : DEFAULT_FILM_COUNT;
 
     return this.filmModel
-      .find({}, {}, {limit})
-      .sort({createdAt: SortType.Down})
-      .populate(['userId'])
-      .exec();
-  }
-
-  public async findByGenreName(genreName: string, count?: number): Promise<DocumentType<FilmEntity>[]> {
-    const limit = count ?? DEFAULT_FILM_COUNT;
-
-    return this.filmModel
-      .find({genre: genreName}, {}, {limit})
-      .sort({createdAt: SortType.Down})
-      .populate(['userId'])
+      .aggregate([
+        { $match: { genre: genreName } },
+        {
+          $lookup: {
+            from: 'users',
+            let: { userId: '$userId' },
+            pipeline: [{ $match: { $expr: { $eq: ['$$userId', '$_id'] } } }],
+            as: 'userId',
+          },
+        },
+        {
+          $addFields: {
+            id: { $toString: '$_id' },
+            isWatchlist:  {
+              $cond: {
+                if: { $in: [ '$_id', watchlist ] },
+                then: true,
+                else: false,
+              }
+            }
+          }
+        },
+        { $limit: limit },
+        { $sort: { createdAt: SortType.Down } },
+      ])
       .exec();
   }
 
