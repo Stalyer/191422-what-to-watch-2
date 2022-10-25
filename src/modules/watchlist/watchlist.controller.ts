@@ -12,6 +12,7 @@ import FilmResponse from '../film/response/film.response.js';
 import {FilmServiceInterface} from '../film/film-service.interface.js';
 import {PrivateRouteMiddleware} from '../../common/middlewares/private-route.middleware.js';
 import {DocumentExistsMiddleware} from '../../common/middlewares/document-exists.middleware.js';
+import {ConfigInterface} from '../../common/config/config.interface.js';
 
 type ParamsGetFilm = {
   filmId: string;
@@ -21,10 +22,11 @@ type ParamsGetFilm = {
 export default class WatchlistController extends Controller {
   constructor(
     @inject(Component.LoggerInterface) logger: LoggerInterface,
+    @inject(Component.ConfigInterface) configService: ConfigInterface,
     @inject(Component.WatchlistServiceInterface) private readonly watchlistService: WatchlistServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface
   ) {
-    super(logger);
+    super(logger, configService);
     this.logger.info('Register routes for WatchlistController…');
 
     this.addRoute({

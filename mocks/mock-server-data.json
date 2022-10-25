@@ -25,13 +25,7 @@
       2004
     ],
     "previewVideoImage": [
-      "preview-video-image-1.jpg",
-      "preview-video-image-2.jpg",
-      "preview-video-image-3.jpg",
-      "preview-video-image-4.jpg",
-      "preview-video-image-5.jpg",
-      "preview-video-image-6.jpg",
-      "preview-video-image-7.jpg"
+      "player-poster.jpg"
     ],
     "previewVideoLink": [
       "https://some-link?1",
@@ -58,16 +52,20 @@
       "Wes Anderson"
     ],
     "posterImage": [
-      "poster-image-1.jpg",
-      "poster-image-2.jpg",
-      "poster-image-3.jpg",
-      "poster-image-4.jpg"
+      "bohemian-rhapsody.jpg",
+      "johnny-english.jpg",
+      "moonrise-kingdom.jpg",
+      "pulp-fiction.jpg",
+      "snatch.jpg",
+      "what-we-do-in-the-shadows.jpg",
+      "aviator.jpg",
+      "dardjeeling-limited.jpg",
+      "macbeth.jpg",
+      "no-country-for-old-men.jpg",
+      "revenant.jpg"
     ],
     "backgroundImage": [
-      "backgroundI-image-1.jpg",
-      "backgroundI-image-2.jpg",
-      "backgroundI-image-3.jpg",
-      "backgroundI-image-4.jpg"
+      "bg-header.jpg"
     ],
     "backgroundColor": [
       "#EBC996",

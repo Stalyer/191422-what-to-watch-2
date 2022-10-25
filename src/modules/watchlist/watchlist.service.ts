@@ -75,4 +75,12 @@ export default class WatchlistService implements WatchlistServiceInterface {
       .findOneAndDelete({userId, filmId})
       .exec();
   }
+
+  public async deleteByFilmId(filmId: string): Promise<number> {
+    const result = await this.watchlistModel
+      .deleteMany({filmId})
+      .exec();
+
+    return result.deletedCount;
+  }
 }

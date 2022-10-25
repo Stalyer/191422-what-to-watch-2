@@ -10,4 +10,5 @@ export interface WatchlistServiceInterface {
   findIds(userId: string): Promise<Types.ObjectId[]>;
   findById(userId: string, filmId: string): Promise<DocumentType<WatchlistEntity> | null>;
   deleteById(userId: string, filmId: string): Promise<DocumentType<WatchlistEntity> | null>;
+  deleteByFilmId(filmId: string): Promise<number | null>;
 }

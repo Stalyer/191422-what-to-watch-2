@@ -28,9 +28,6 @@ export default class CreateFilmDto {
   @IsInt({message: 'released must be an integer'})
   public released!: number;
 
-  @IsString({message: 'previewVideoImage is required'})
-  public previewVideoImage!: string;
-
   @IsString({message: 'previewVideoLink is required'})
   public previewVideoLink!: string;
 
@@ -42,12 +39,6 @@ export default class CreateFilmDto {
 
   @IsInt({message: 'runTime must be an integer'})
   public runTime!: number;
-
-  @IsString({message: 'posterImage is required'})
-  public posterImage!: string;
-
-  @IsString({message: 'backgroundImage is required'})
-  public backgroundImage!: string;
 
   @IsString({message: 'backgroundColor is required'})
   public backgroundColor!: string;

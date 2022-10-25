@@ -41,7 +41,7 @@ export class FilmEntity extends defaultClasses.TimeStamps {
   @prop({default: 0})
   public rating!: number;
 
-  @prop({required: true})
+  @prop({default: ''})
   public previewVideoImage!: string;
 
   @prop({required: true})
@@ -59,10 +59,10 @@ export class FilmEntity extends defaultClasses.TimeStamps {
   @prop({default: 0})
   public commentCount!: number;
 
-  @prop({required: true})
+  @prop({default: ''})
   public posterImage!: string;
 
-  @prop({required: true})
+  @prop({default: ''})
   public backgroundImage!: string;
 
   @prop({required: true})
