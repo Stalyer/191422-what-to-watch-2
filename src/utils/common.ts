@@ -53,6 +53,7 @@ export const createFilm = (row: string) => {
       email: useEmail,
       avatarPath: userAvatarPath,
     },
+    isPromo: false
   } as Film;
 };
 

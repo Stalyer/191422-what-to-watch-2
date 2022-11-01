@@ -34,13 +34,13 @@ applicationContainer.bind<Application>(Component.Application).to(Application).in
 applicationContainer.bind<LoggerInterface>(Component.LoggerInterface).to(LoggerService).inSingletonScope();
 applicationContainer.bind<ConfigInterface>(Component.ConfigInterface).to(ConfigService).inSingletonScope();
 applicationContainer.bind<DatabaseInterface>(Component.DatabaseInterface).to(DatabaseService).inSingletonScope();
-applicationContainer.bind<UserServiceInterface>(Component.UserServiceInterface).to(UserService);
+applicationContainer.bind<UserServiceInterface>(Component.UserServiceInterface).to(UserService).inSingletonScope();
 applicationContainer.bind<types.ModelType<UserEntity>>(Component.UserModel).toConstantValue(UserModel);
-applicationContainer.bind<FilmServiceInterface>(Component.FilmServiceInterface).to(FilmService);
+applicationContainer.bind<FilmServiceInterface>(Component.FilmServiceInterface).to(FilmService).inSingletonScope();
 applicationContainer.bind<types.ModelType<FilmEntity>>(Component.FilmModel).toConstantValue(FilmModel);
 applicationContainer.bind<CommentServiceInterface>(Component.CommentServiceInterface).to(CommentService).inSingletonScope();
 applicationContainer.bind<types.ModelType<CommentEntity>>(Component.CommentModel).toConstantValue(CommentModel);
-applicationContainer.bind<WatchlistServiceInterface>(Component.WatchlistServiceInterface).to(WatchlistService);
+applicationContainer.bind<WatchlistServiceInterface>(Component.WatchlistServiceInterface).to(WatchlistService).inSingletonScope();
 applicationContainer.bind<types.ModelType<WatchlistEntity>>(Component.WatchlistModel).toConstantValue(WatchlistModel);
 
 applicationContainer.bind<ControllerInterface>(Component.FilmController).to(FilmController).inSingletonScope();

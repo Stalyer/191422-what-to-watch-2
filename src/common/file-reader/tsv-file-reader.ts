@@ -2,6 +2,8 @@ import EventEmitter from 'events';
 import { createReadStream } from 'fs';
 import { FileReaderInterface } from './file-reader.interface.js';
 
+const MAX_SIZE_BUFFER = 18000;
+
 export default class TSVFileReader extends EventEmitter implements FileReaderInterface {
   constructor(public filename: string) {
     super();
@@ -9,7 +11,7 @@ export default class TSVFileReader extends EventEmitter implements FileReaderInt
 
   public async read():Promise<void> {
     const stream = createReadStream(this.filename, {
-      highWaterMark: 18000,
+      highWaterMark: MAX_SIZE_BUFFER,
       encoding: 'utf-8',
     });
 

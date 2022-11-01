@@ -17,6 +17,7 @@ export default class ExceptionFilter implements ExceptionFilterInterface {
     this.logger.info('Register ExceptionFilter');
   }
 
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   private handleHttpError(error: HttpError, _req: Request, res: Response, _next: NextFunction) {
     this.logger.error(`[${error.detail}]: ${error.httpStatusCode} — ${error.message}`);
     res
@@ -24,6 +25,7 @@ export default class ExceptionFilter implements ExceptionFilterInterface {
       .json(createErrorObject(ServiceError.CommonError, error.message));
   }
 
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   private handleOtherError(error: Error, _req: Request, res: Response, _next: NextFunction) {
     this.logger.error(error.message);
     res
@@ -31,6 +33,7 @@ export default class ExceptionFilter implements ExceptionFilterInterface {
       .json(createErrorObject(ServiceError.ServiceError, error.message));
   }
 
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   private handleValidationError(error: ValidationError, _req: Request, res: Response, _next: NextFunction) {
     this.logger.error(`[Validation Error]: ${error.message}`);
     error.details.forEach(

@@ -12,6 +12,7 @@ import FilmService from '../modules/film/film.service.js';
 import UserService from '../modules/user/user.service.js';
 import {FilmModel} from '../modules/film/film.entity.js';
 import {UserModel} from '../modules/user/user.entity.js';
+import {CommentModel} from '../modules/comment/comment.entity.js';
 import {Film} from '../types/film.type.js';
 import {LoggerInterface} from '../common/logger/logger.interface.js';
 import {DatabaseInterface} from '../common/database-client/database.interface.js';
@@ -32,7 +33,7 @@ export default class ImportCommand implements CliCommandInterface {
     this.onComplete = this.onComplete.bind(this);
 
     this.logger = new ConsoleLoggerService();
-    this.filmService = new FilmService(this.logger, FilmModel);
+    this.filmService = new FilmService(this.logger, FilmModel, CommentModel);
     this.userService = new UserService(this.logger, UserModel);
     this.databaseService = new DatabaseService(this.logger);
   }

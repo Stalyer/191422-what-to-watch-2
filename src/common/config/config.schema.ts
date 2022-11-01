@@ -1,5 +1,6 @@
 import convict from 'convict';
 import validator from 'convict-format-with-validator';
+import {DEFAULT_PORT, DEFAULT_DB_PORT} from './config.constant.js';
 
 convict.addFormats(validator);
 
@@ -22,7 +23,7 @@ export const configSchema = convict<ConfigSchema>({
     doc: 'Port for incoming connections',
     format: 'port',
     env: 'PORT',
-    default: 4000
+    default: DEFAULT_PORT
   },
   SALT: {
     doc: 'Salt for password hash',
@@ -52,7 +53,7 @@ export const configSchema = convict<ConfigSchema>({
     doc: 'Port to connect to the database (MongoDB)',
     format: 'port',
     env: 'DB_PORT',
-    default: 27017,
+    default: DEFAULT_DB_PORT,
   },
   DB_NAME: {
     doc: 'Database name (MongoDB)',
