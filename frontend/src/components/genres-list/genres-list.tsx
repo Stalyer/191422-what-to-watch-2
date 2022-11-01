@@ -5,7 +5,7 @@ import { useAppSelector, useAppDispatch } from '../../hooks/';
 import { setActiveGenre } from '../../store/genre-data/genre-data';
 import { getGenres, getActiveGenre } from '../../store/genre-data/selectors';
 import { DEFAULT_GENRE } from '../../const';
-import { capitalize } from '../../util';
+import { capitalize } from '../../utils/utils';
 
 function GenresList() {
   const dispatch = useAppDispatch();

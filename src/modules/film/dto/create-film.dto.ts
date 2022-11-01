@@ -31,6 +31,9 @@ export default class CreateFilmDto {
   @IsString({message: 'previewVideoLink is required'})
   public previewVideoLink!: string;
 
+  @IsString({message: 'videoLink is required'})
+  public videoLink!: string;
+
   @IsArray({message: 'Field starring must be an array'})
   public starring!: string[];
 

@@ -1,65 +1,43 @@
-import {Expose, Type} from 'class-transformer';
-import UserResponse from '../../user/response/user.response.js';
+import UserDto from '../../dto/user/user.dto';
 
-export default class FilmResponse {
-  @Expose()
+export default class FilmDto {
   public id!: string;
 
-  @Expose()
   public name!: string;
 
-  @Expose()
   public description!: string;
 
-  @Expose()
-  public publictionDate!: Date;
+  public publictionDate!: string;
 
-  @Expose()
   public genre!: string;
 
-  @Expose()
   public released!: number;
 
-  @Expose()
   public rating!: number;
 
-  @Expose()
   public previewVideoImage!: string;
 
-  @Expose()
   public previewVideoLink!: string;
 
-  @Expose()
   public videoLink!: string;
 
-  @Expose()
   public starring!: string[];
 
-  @Expose()
   public director!: string;
 
-  @Expose()
   public runTime!: number;
 
-  @Expose()
   public commentCount!: number;
 
-  @Expose()
   public posterImage!: string;
 
-  @Expose()
   public backgroundImage!: string;
 
-  @Expose()
   public backgroundColor!: string;
 
-  @Expose({ name: 'userId'})
-  @Type(() => UserResponse)
-  public user!: UserResponse;
+  public user!: UserDto;
 
-  @Expose()
   public isPromo!: boolean;
 
-  @Expose()
   public isWatchlist!: boolean;
 }

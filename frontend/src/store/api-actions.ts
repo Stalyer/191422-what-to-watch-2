@@ -33,7 +33,6 @@ import {
 import { setUser, setAuthorizationStatus } from './user-data/user-data';
 import { AppDispatch, State } from '../types/state';
 import { Film } from '../types/film';
-import { Review } from '../types/review';
 import { NewReview } from '../types/new-review';
 import { AuthData } from '../types/auth-data';
 import { Token } from '../types/token';
@@ -43,9 +42,27 @@ import {
   AuthorizationStatus,
   DEFAULT_GENRE,
   NameSpace,
+  HTTP_CODE
 } from '../const';
 import { saveToken, dropToken } from '../services/token';
 import { NewUser } from '../types/new-user';
+import {
+  adaptCommentsToClient,
+  adaptFilmToClient,
+  adaptFilmsToClient,
+  adaptUserToClient
+} from '../utils/adapters/adaptersToClient';
+import {
+  adaptCreateFilmToServer,
+  adaptUpdateFilmToServer,
+  adaptCreateCommentToServer,
+  adaptAvatarToServer,
+  adaptImageToServer
+} from '../utils/adapters/adaptersToServer';
+import FilmDto from '../dto/film/film.dto';
+import CommentDto from '../dto/comment/comment.dto';
+import CreateUserWithIdDto from '../dto/user/create-user-with-id.dto';
+import CreateCommentDto from '../dto/comment/create-comment.dto';
 
 type AsyncThunkConfig = {
   dispatch: AppDispatch;
@@ -58,8 +75,8 @@ export const fetchFilms = createAsyncThunk<void, undefined, AsyncThunkConfig>(
   async (_arg, { dispatch, extra: api }) => {
     dispatch(setFilmsIsLoading(true));
     try {
-      const { data } = await api.get<Film[]>(APIRoute.Films);
-      dispatch(setFilms(data));
+      const { data } = await api.get<FilmDto[]>(APIRoute.Films);
+      dispatch(setFilms(adaptFilmsToClient(data)));
     } catch (error) {
       dispatch(setFilms([]));
       toast.error('Can\'t fetch films');
@@ -82,8 +99,8 @@ export const fetchFilmsByGenre = createAsyncThunk<
       if (genre === DEFAULT_GENRE) {
         route = APIRoute.Films;
       }
-      const { data } = await api.get<Film[]>(route);
-      dispatch(setFilmsByGenre(data));
+      const { data } = await api.get<FilmDto[]>(route);
+      dispatch(setFilmsByGenre(adaptFilmsToClient(data)));
     } catch (error) {
       dispatch(setFilmsByGenre([]));
       toast.error('Can\'t fetch films by genre');
@@ -98,8 +115,8 @@ export const fetchFilm = createAsyncThunk<void, string, AsyncThunkConfig>(
   async (id, { dispatch, extra: api }) => {
     dispatch(setFilmIsLoading(true));
     try {
-      const { data } = await api.get<Film>(`${APIRoute.Films}/${id}`);
-      dispatch(setActiveFilm(data));
+      const { data } = await api.get<FilmDto>(`${APIRoute.Films}/${id}`);
+      dispatch(setActiveFilm(adaptFilmToClient(data)));
     } catch (error) {
       dispatch(setActiveFilm(null));
       toast.error('Can\'t fetch film');
@@ -113,11 +130,25 @@ export const editFilm = createAsyncThunk<void, Film, AsyncThunkConfig>(
   `${NameSpace.Film}/editFilm`,
   async (filmData, { dispatch, extra: api }) => {
     try {
-      const { data } = await api.put<Film>(
-        `${APIRoute.Films}/${filmData.id}`,
-        filmData
-      );
-      dispatch(setActiveFilm(data));
+      const postData = await api.patch<FilmDto>(`${APIRoute.Films}/${filmData.id}`, adaptUpdateFilmToServer(filmData));
+
+      if (postData.status === HTTP_CODE.OK && filmData.posterImage) {
+        const postImageApiRoute = `${APIRoute.Films}/${filmData.id}/image/poster`;
+
+        await api.post(postImageApiRoute, adaptImageToServer(filmData.posterImage), {
+          headers: {'Content-Type': 'multipart/form-data'},
+        });
+      }
+
+      if (postData.status === HTTP_CODE.OK && filmData.backgroundImage) {
+        const postImageApiRoute = `${APIRoute.Films}/${filmData.id}/image/background`;
+
+        await api.post(postImageApiRoute, adaptImageToServer(filmData.backgroundImage), {
+          headers: {'Content-Type': 'multipart/form-data'},
+        });
+      }
+
+      dispatch(setActiveFilm(adaptFilmToClient(postData.data)));
     } catch {
       throw new Error('Can\'t edit film');
     }
@@ -128,8 +159,25 @@ export const addFilm = createAsyncThunk<void, NewFilm, AsyncThunkConfig>(
   `${NameSpace.Film}/addFilm`,
   async (filmData, { dispatch, extra: api }) => {
     try {
-      const { data } = await api.post<Film>(APIRoute.Add, filmData);
-      dispatch(setActiveFilm(data));
+      const postData = await api.post<FilmDto>(APIRoute.Add, adaptCreateFilmToServer(filmData));
+
+      if (postData.status === HTTP_CODE.CREATED && filmData.posterImage) {
+        const postImageApiRoute = `${APIRoute.Films}/${postData.data.id}/image/poster`;
+
+        await api.post(postImageApiRoute, adaptImageToServer(filmData.posterImage), {
+          headers: {'Content-Type': 'multipart/form-data'},
+        });
+      }
+
+      if (postData.status === HTTP_CODE.CREATED && filmData.backgroundImage) {
+        const postImageApiRoute = `${APIRoute.Films}/${postData.data.id}/image/background`;
+
+        await api.post(postImageApiRoute, adaptImageToServer(filmData.backgroundImage), {
+          headers: {'Content-Type': 'multipart/form-data'},
+        });
+      }
+
+      dispatch(setActiveFilm(adaptFilmToClient(postData.data)));
     } catch {
       throw new Error('Can\'t add film');
     }
@@ -140,7 +188,7 @@ export const deleteFilm = createAsyncThunk<void, string, AsyncThunkConfig>(
   `${NameSpace.Film}/deleteFilm`,
   async (id, { dispatch, extra: api }) => {
     try {
-      await api.delete(`${APIRoute.Films}/${id}`);
+      await api.delete<FilmDto>(`${APIRoute.Films}/${id}`);
       dispatch(setActiveFilm(null));
     } catch {
       throw new Error('Can\'t delete film');
@@ -157,10 +205,10 @@ export const fetchSimilarFilms = createAsyncThunk<
   async (id, { dispatch, extra: api }) => {
     dispatch(setSimilarFilmsIsLoading(true));
     try {
-      const { data } = await api.get<Film[]>(
-        `${APIRoute.Films}/${id}${APIRoute.Similar}`
+      const { data } = await api.get<FilmDto[]>(
+        `${APIRoute.Films}`
       );
-      dispatch(setSimilarFilms(data));
+      dispatch(setSimilarFilms(adaptFilmsToClient(data)));
     } catch (error) {
       dispatch(setSimilarFilms([]));
       toast.error('Can\'t fetch similar films');
@@ -175,8 +223,8 @@ export const fetchReviews = createAsyncThunk<void, string, AsyncThunkConfig>(
   async (id, { dispatch, extra: api }) => {
     dispatch(setReviewsIsLoading(true));
     try {
-      const { data } = await api.get<Review[]>(`${APIRoute.Comments}/${id}`);
-      dispatch(setReviews(data));
+      const { data } = await api.get<CommentDto[]>(`${APIRoute.Comments}/${id}`);
+      dispatch(setReviews(adaptCommentsToClient(data)));
     } catch (error) {
       dispatch(setReviews([]));
       toast.error('Can\'t fetch reviews');
@@ -195,7 +243,7 @@ export const postReview = createAsyncThunk<
   async ({ id, review }, { dispatch, extra: api }) => {
     dispatch(setReviewsIsLoading(true));
     try {
-      await api.post<Review>(`${APIRoute.Comments}/${id}`, review);
+      await api.post<CreateCommentDto>(`${APIRoute.Comments}/${id}`, adaptCreateCommentToServer(review));
     } finally {
       dispatch(setReviewsIsLoading(false));
     }
@@ -203,12 +251,12 @@ export const postReview = createAsyncThunk<
 );
 
 export const checkAuth = createAsyncThunk<void, undefined, AsyncThunkConfig>(
-  `${NameSpace.User}/checkAuth`,
+  `${NameSpace.User}/login`,
   async (_arg, { dispatch, extra: api }) => {
     try {
       const { data } = await api.get(APIRoute.Login);
       dispatch(setAuthorizationStatus(AuthorizationStatus.Auth));
-      dispatch(setUser(data));
+      dispatch(setUser(adaptUserToClient(data)));
     } catch {
       dispatch(setAuthorizationStatus(AuthorizationStatus.NoAuth));
       dispatch(setUser(null));
@@ -254,8 +302,8 @@ export const fetchFavoriteFilms = createAsyncThunk<
   async (_arg, { dispatch, extra: api }) => {
     dispatch(setFavoriteFilmsIsLoading(true));
     try {
-      const { data } = await api.get<Film[]>(`${APIRoute.Favorite}`);
-      dispatch(setFavoriteFilms(data));
+      const { data } = await api.get<FilmDto[]>(`${APIRoute.Favorite}`);
+      dispatch(setFavoriteFilms(adaptFilmsToClient(data)));
     } catch (error) {
       toast.error('Can\'t fetch favorite films');
     } finally {
@@ -269,8 +317,8 @@ export const fetchPromo = createAsyncThunk<void, undefined, AsyncThunkConfig>(
   async (_arg, { dispatch, extra: api }) => {
     dispatch(setPromoFilmIsLoading(true));
     try {
-      const { data } = await api.get<Film>(`${APIRoute.Promo}`);
-      dispatch(setPromoFilm(data));
+      const { data } = await api.get<FilmDto>(`${APIRoute.Promo}`);
+      dispatch(setPromoFilm(adaptFilmToClient(data)));
     } catch (error) {
       dispatch(setPromoFilm(null));
       toast.error('Can\'t fetch promo film');
@@ -288,10 +336,16 @@ export const setFavorite = createAsyncThunk<
   `${NameSpace.FavoriteFilms}/setFavorite`,
   async ({ id, status }, { dispatch, extra: api }) => {
     try {
-      const { data } = await api.post<Film>(
-        `${APIRoute.Favorite}/${id}/${status}`
-      );
-      dispatch(setFilm(data));
+      if (status === 1) {
+        const { data } = await api.post<FilmDto>(`${APIRoute.Favorite}/${id}`);
+        dispatch(setFilm(adaptFilmToClient(data)));
+      }
+
+      if (status === 0) {
+        const { data } = await api.delete<FilmDto>(`${APIRoute.Favorite}/${id}`);
+        dispatch(setFilm(adaptFilmToClient(data)));
+      }
+
     } catch (error) {
       toast.error('Can\'t add to or remove from MyList');
     }
@@ -301,13 +355,14 @@ export const setFavorite = createAsyncThunk<
 export const registerUser = createAsyncThunk<void, NewUser, AsyncThunkConfig>(
   `${NameSpace.User}/register`,
   async (userData, { extra: api }) => {
-    const { avatar } = userData;
-    delete userData.avatar;
-
     try {
-      const { data } = await api.post<{ id: string }>(APIRoute.Register, userData);
-      if (avatar) {
-        await api.post(`/${data.id}${APIRoute.SetAvatar}`, avatar);
+      const postData = await api.post<CreateUserWithIdDto>(APIRoute.Register, userData);
+      if (postData.status === HTTP_CODE.CREATED && userData.avatar) {
+        const postAvatarApiRoute = `${APIRoute.User}/${postData.data.id}/avatar`;
+
+        await api.post(postAvatarApiRoute, adaptAvatarToServer(userData.avatar), {
+          headers: {'Content-Type': 'multipart/form-data'},
+        });
       }
     } catch {
       throw new Error('Can\'t sign up');

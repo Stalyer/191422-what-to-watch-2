@@ -43,6 +43,10 @@ export default class UpdateFilmDto {
   public previewVideoLink?: string;
 
   @IsOptional()
+  @IsString({message: 'videoLink is required'})
+  public videoLink?: string;
+
+  @IsOptional()
   @IsArray({message: 'Field starring must be an array'})
   public starring?: string[];
 

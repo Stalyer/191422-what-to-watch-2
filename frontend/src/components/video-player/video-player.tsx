@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Spinner from '../spinner/spinner';
 import { Film } from '../../types/film';
 import { AppRoute } from '../../const';
-import { formatRemainingTime } from '../../util';
+import { formatRemainingTime } from '../../utils/utils';
 
 type VideoPlayerProps = {
   film: Film;

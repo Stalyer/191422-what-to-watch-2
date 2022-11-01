@@ -3,7 +3,7 @@ import { getToken } from './token';
 import { store } from '../store';
 import { setToDefault } from '../store/user-data/user-data';
 
-const BACKEND_URL = 'https://9.react.pages.academy/wtw';
+const BACKEND_URL = 'http://localhost:4000';
 const REQUEST_TIMEOUT = 5000;
 
 export const createAPI = () => {
@@ -16,7 +16,7 @@ export const createAPI = () => {
     const token = getToken();
 
     if (token) {
-      config.headers['x-token'] = token;
+      config.headers['Authorization'] = `Bearer: ${token}`;
     }
 
     return config;

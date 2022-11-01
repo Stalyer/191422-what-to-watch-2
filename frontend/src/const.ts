@@ -28,16 +28,16 @@ export const DEFAULT_GENRE = 'All genres';
 
 export enum APIRoute {
   Films = '/films',
-  Similar = '/similar',
-  Promo = '/promo',
-  Favorite = '/favorite',
+  Similar = '/films',
+  Promo = '/films/promo',
+  Favorite = '/watchlist',
   Comments = '/comments',
-  Login = '/login',
-  Logout = '/logout',
-  Register = '/register',
-  Add = '/add',
+  User = '/users',
+  Login = '/users/login',
+  Logout = '/users/logout',
+  Register = '/users/register',
+  Add = '/films',
   Genre = '/films/genre',
-  SetAvatar = '/avatar'
 }
 
 export enum NameSpace {
@@ -49,4 +49,13 @@ export enum NameSpace {
   User = 'USER',
   FavoriteFilms = 'FAVORITE FILMS',
   Genre = 'GENRE',
+}
+
+export enum HTTP_CODE {
+  OK = 200,
+  CREATED = 201,
+  BAD_REQUEST = 400,
+  UNAUTHORIZED = 401,
+  NOT_FOUND = 404,
+  CONFLICT = 409,
 }

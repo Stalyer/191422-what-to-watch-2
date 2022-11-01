@@ -35,4 +35,9 @@ export const formatRemainingTime = (remainingTime: number): string => {
 
 const capitalize = (str: string) => str[0].toUpperCase() + str.slice(1);
 
-export { getRatingText, formatRunTime, formatReviewDate, capitalize };
+const getTime = () => {
+  const now = new Date();
+  return now.toISOString();
+};
+
+export { getRatingText, formatRunTime, formatReviewDate, capitalize, getTime };

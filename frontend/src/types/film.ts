@@ -18,3 +18,5 @@ export type Film = {
   isFavorite: boolean;
   user: User;
 };
+
+export type FilmEdit = Omit<Film, 'isFavorite' | 'rating' | 'user'>;

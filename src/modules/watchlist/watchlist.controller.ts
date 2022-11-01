@@ -70,7 +70,9 @@ export default class WatchlistController extends Controller {
     res: Response
   ): Promise<void> {
     const result = await this.watchlistService.create({userId: user.id, filmId: params.filmId});
-    this.created(res, `Add to ${result.filmId}`);
+    const watchlist = user ? await this.watchlistService.findIds(user.id) : [];
+    const film = await this.filmService.findById(String(result.filmId), watchlist);
+    this.created(res, fillDTO(FilmResponse, film));
   }
 
   public async delete(
@@ -78,6 +80,12 @@ export default class WatchlistController extends Controller {
     res: Response
   ): Promise<void> {
     const result = await this.watchlistService.deleteById(user.id, params.filmId);
-    this.noContent(res, result);
+    if (result) {
+      const watchlist = user ? await this.watchlistService.findIds(user.id) : [];
+      const film = await this.filmService.findById(String(result.filmId), watchlist);
+      this.created(res, fillDTO(FilmResponse, film));
+    } else {
+      this.noContent(res, result);
+    }
   }
 }
